@@ -1,0 +1,21 @@
+<%- include("partials/header.ejs") %>
+
+<div class="createBox main-container">
+  <form>
+    <div class="blog-title">
+      <label for="title">Title</label>
+      <input type="text" name="title" placeholder="Blog Title" />
+    </div>
+    <div class="blog-content">
+      <label for="content">Content</label>
+      <textarea name="content" rows="5" placeholder="Blog Content"></textarea>
+    </div>
+    <div class="blog-author">
+      <label for="author">Author</label>
+      <input type="text" name="author" placeholder="Author Name" />
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+</div>
+
+<%- include("partials/footer.ejs") %>
