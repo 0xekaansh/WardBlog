@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-const port = process.env.port || 3000;
+const port = process.env.APP_PORT || 4000;
 
 //just for functionality will add postresql later
 let posts = [
@@ -39,8 +39,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 //Homepage
-app.get("/", (req, res) => {
-  res.render("blog.ejs");
+app.get("/posts", (req, res) => {
+  res.json(posts);
 });
 
 //createNewPost

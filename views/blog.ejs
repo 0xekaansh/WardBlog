@@ -4,6 +4,26 @@
   <div class="main-heading"><h1>Welcome</h1></div>
   <div class="button new"><a id="newPost" href="/new">Create Blog</a></div>
   <div class="button view"><a id="viewPosts" href="/view">View All Posts</a></div>
+  
+  <div class="posts"><ul id="postsList">
+    <% posts.forEach(post=> { %>
+      <li>
+        <h2>
+          <%=post.title%>
+        </h2>
+        <small>
+          <%=post.date %>
+        </small>
+        <p>
+          <%=post.content%>
+        </p>
+        <small>By: <%=post.author%> </small>
+        <a class="edit" href="/edit/<%= post.id %>">Edit</a>
+        <a class="delete" href="/api/posts/delete/<%= post.id %>">Delete</a>
+      </li>
+      <% }); %>
+  </ul>
+</div>
 </main>
 
 <%- include("partials/footer.ejs") %>
