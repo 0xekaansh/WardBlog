@@ -1,6 +1,6 @@
 import express from "express";
 import axios from "axios";
-import dotenv, { config } from "dotenv";
+import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -33,10 +33,9 @@ app.get("/new", (req, res) => {
 });
 
 //newPost-submission
-app.post("/api/blog", async (req, res) => {
+app.post("/api/posts", async (req, res) => {
   try {
     const response = await axios.post(`${API_URL}/posts`, req.body);
-    console.log(response.data);
     res.redirect("/");
   } catch (error) {
     res.status(500).json({ message: "Error creating post" });
@@ -47,7 +46,6 @@ app.post("/api/blog", async (req, res) => {
 app.get("/edit/:id", async (req, res) => {
   try {
     const response = await axios.get(`${API_URL}/posts/${req.params.id}`);
-    console.log(response.data);
     res.render("createPost.ejs", {
       heading: "Edit Post",
       submit: "Update Post",
@@ -65,7 +63,6 @@ app.post("/api/posts/:id", async (req, res) => {
       `${API_URL}/posts/${req.params.id}`,
       req.body,
     );
-    console.log(response.data);
     res.redirect("/");
   } catch (error) {
     res.status(500).json({ message: "Error updating post" });

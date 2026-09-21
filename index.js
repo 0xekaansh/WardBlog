@@ -1,4 +1,4 @@
-import express, { json } from "express";
+import express from "express";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -59,7 +59,10 @@ app.post("/posts", (req, res) => {
 
 //find-editPost-Id
 app.get("/posts/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Invalid post ID format." });
+  }
   const findPost = posts.find((post) => post.id === id);
   if (!findPost) return res.status(404).json({ message: "Post not found" });
   res.json(findPost);
@@ -67,7 +70,11 @@ app.get("/posts/:id", (req, res) => {
 
 //patch-editPost
 app.patch("/posts/:id", (req, res) => {
-  const patchedPost = posts.find((post) => post.id === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Invalid post ID format." });
+  }
+  const patchedPost = posts.find((post) => post.id === id);
   if (!patchedPost) return res.status(404).json({ message: "Post not found" });
   if (req.body.title) patchedPost.title = req.body.title;
   if (req.body.content) patchedPost.content = req.body.content;
@@ -77,9 +84,11 @@ app.patch("/posts/:id", (req, res) => {
 
 //delete
 app.delete("/posts/:id", (req, res) => {
-  const searchIndex = posts.findIndex(
-    (post) => post.id === parseInt(req.params.id),
-  );
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Invalid post ID format." });
+  }
+  const searchIndex = posts.findIndex((post) => post.id === id);
   if (searchIndex === -1)
     return res.status(404).json({ message: "Post not found" });
 
