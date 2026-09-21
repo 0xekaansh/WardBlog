@@ -68,11 +68,23 @@ app.get("/posts/:id", (req, res) => {
 //patch-editPost
 app.patch("/posts/:id", (req, res) => {
   const patchedPost = posts.find((post) => post.id === parseInt(req.params.id));
-  if (!patchedPost) return res.status(404).json({ message: "Post not Found" });
+  if (!patchedPost) return res.status(404).json({ message: "Post not found" });
   if (req.body.title) patchedPost.title = req.body.title;
   if (req.body.content) patchedPost.content = req.body.content;
   if (req.body.author) patchedPost.author = req.body.author;
   res.json(patchedPost);
+});
+
+//delete
+app.delete("/posts/:id", (req, res) => {
+  const searchIndex = posts.findIndex(
+    (post) => post.id === parseInt(req.params.id),
+  );
+  if (searchIndex === -1)
+    return res.status(404).json({ message: "Post not found" });
+
+  posts.splice(searchIndex, 1);
+  res.json({ message: "Post Deleted" });
 });
 
 app.listen(port, () => {
