@@ -2,8 +2,6 @@
 
 <main class="main-container">
   <div class="main-heading"><h1>Welcome</h1></div>
-  <div class="button new"><a id="newPost" href="/new">Create Blog</a></div>
-  <div class="button view"><a id="viewPosts" href="/view">View All Posts</a></div>
   
   <div class="posts"><ul id="postsList">
     <% posts.forEach(post=> { %>
@@ -17,9 +15,13 @@
         <p>
           <%=post.content%>
         </p>
-        <small>By: <%=post.author%> </small>
-        <a class="edit" href="/edit/<%= post.id %>">Edit</a>
-        <a class="delete" href="/api/posts/delete/<%= post.id %>">Delete</a>
+        <div class="post-actions">
+          <small>By: <%=post.author%> </small>
+          <a class="edit-btn" href="/edit/<%= post.id %>">Edit</a>
+          <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
+            <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">Delete</button>
+          </form>
+        </div>
       </li>
       <% }); %>
   </ul>
