@@ -1,99 +1,109 @@
 import express from "express";
 import dotenv from "dotenv";
+import pg from "pg";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.APP_PORT || 4000;
 
-//just for functionality will add postresql later
-let posts = [
-  {
-    id: 1,
-    title: "The Rise of Decentralized Finance",
-    content:
-      "Decentralized Finance (DeFi) is an emerging and rapidly evolving field in the blockchain industry. It refers to the shift from traditional, centralized financial systems to peer-to-peer finance enabled by decentralized technologies built on Ethereum and other blockchains. With the promise of reduced dependency on the traditional banking sector, DeFi platforms offer a wide range of services, from lending and borrowing to insurance and trading.",
-    author: "Alex Thompson",
-    date: "2023-08-01T10:00:00Z",
-  },
-  {
-    id: 2,
-    title: "The Impact of Artificial Intelligence on Modern Businesses",
-    content:
-      "Artificial Intelligence (AI) is no longer a concept of the future. It's very much a part of our present, reshaping industries and enhancing the capabilities of existing systems. From automating routine tasks to offering intelligent insights, AI is proving to be a boon for businesses. With advancements in machine learning and deep learning, businesses can now address previously insurmountable problems and tap into new opportunities.",
-    author: "Mia Williams",
-    date: "2023-08-05T14:30:00Z",
-  },
-  {
-    id: 3,
-    title: "Sustainable Living: Tips for an Eco-Friendly Lifestyle",
-    content:
-      "Sustainability is more than just a buzzword; it's a way of life. As the effects of climate change become more pronounced, there's a growing realization about the need to live sustainably. From reducing waste and conserving energy to supporting eco-friendly products, there are numerous ways we can make our daily lives more environmentally friendly. This post will explore practical tips and habits that can make a significant difference.",
-    author: "Samuel Green",
-    date: "2023-08-10T09:15:00Z",
-  },
-];
-
-let lastId = 3;
+const db = new pg.Pool({
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Homepage/data
-app.get("/posts", (req, res) => {
-  res.json(posts);
+app.get("/posts", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM blogposts ORDER BY id ASC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Failed to retrieve posts: ", err.stack);
+    res.status(500).json({ message: "Database connection error" });
+  }
 });
 
 //createPost-New-data
-app.post("/posts", (req, res) => {
-  const newPost = {
-    id: (lastId += 1),
-    title: req.body.title,
-    content: req.body.content,
-    author: req.body.author,
-    date: new Date(),
-  };
-  posts.push(newPost);
-  res.status(201).json(newPost);
+app.post("/posts", async (req, res) => {
+  const { title, content, author } = req.body;
+  try {
+    const result = await db.query(
+      "INSERT INTO blogposts (title, content, author) VALUES ($1, $2, $3) RETURNING *",
+      [title, content, author],
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Failed to Insert Entered data : ", err.stack);
+    res.status(500).json({ message: "Database Insertion Error" });
+  }
 });
 
 //find-editPost-Id
-app.get("/posts/:id", (req, res) => {
+app.get("/posts/:id", async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
     return res.status(400).json({ message: "Invalid post ID format." });
   }
-  const findPost = posts.find((post) => post.id === id);
-  if (!findPost) return res.status(404).json({ message: "Post not found" });
-  res.json(findPost);
+  try {
+    const result = await db.query("SELECT * FROM blogposts WHERE id = $1", [
+      id,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.log("Failed to fetch post: ", err.stack);
+    res.status(500).json({ message: "Database fetch Error" });
+  }
 });
 
 //patch-editPost
-app.patch("/posts/:id", (req, res) => {
+app.patch("/posts/:id", async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
     return res.status(400).json({ message: "Invalid post ID format." });
   }
-  const patchedPost = posts.find((post) => post.id === id);
-  if (!patchedPost) return res.status(404).json({ message: "Post not found" });
-  if (req.body.title) patchedPost.title = req.body.title;
-  if (req.body.content) patchedPost.content = req.body.content;
-  if (req.body.author) patchedPost.author = req.body.author;
-  res.json(patchedPost);
+
+  const { title, content, author } = req.body;
+  try {
+    const result = await db.query(
+      "UPDATE blogposts SET title = COALESCE($1,title), content = COALESCE($2, content), author = COALESCE($3, author) WHERE id = $4 RETURNING *",
+      [title, content, author, id],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Failed to update data: ", err.stack);
+    res.status(500).json({ message: "Database update error" });
+  }
 });
 
 //delete
-app.delete("/posts/:id", (req, res) => {
+app.delete("/posts/:id", async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
     return res.status(400).json({ message: "Invalid post ID format." });
   }
-  const searchIndex = posts.findIndex((post) => post.id === id);
-  if (searchIndex === -1)
-    return res.status(404).json({ message: "Post not found" });
 
-  posts.splice(searchIndex, 1);
-  res.json({ message: "Post Deleted" });
+  try {
+    const result = await db.query("DELETE FROM blogposts WHERE id = $1 RETURNING *", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.json({message: "Post deleted successfully"});
+  } catch (err) {
+    console.error("Failed to delete post: ", err.stack);
+    res.status(500).json({ message: "Database deletion error" });
+  }
 });
 
 app.listen(port, () => {
