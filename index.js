@@ -18,7 +18,7 @@ const db = new pg.Pool({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-//Homepage/data
+//GET ROUTE TO FORWARD DATA TO BLOG PAGE
 app.get("/posts", async (req, res) => {
   try {
     const result = await db.query("SELECT * FROM blogposts ORDER BY id ASC");
@@ -29,7 +29,7 @@ app.get("/posts", async (req, res) => {
   }
 });
 
-//createPost-New-data
+//POST ROUTE TO SUBMIT NEW BLOG
 app.post("/posts", async (req, res) => {
   const { title, content, author } = req.body;
   try {
@@ -44,7 +44,7 @@ app.post("/posts", async (req, res) => {
   }
 });
 
-//find-editPost-Id
+//GET ROUTE TO FIND SELECTED BLOG TO EDIT
 app.get("/posts/:id", async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
@@ -64,7 +64,7 @@ app.get("/posts/:id", async (req, res) => {
   }
 });
 
-//patch-editPost
+//PATCH ROUTE TO SUBMIT EDITED BLOG
 app.patch("/posts/:id", async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
@@ -87,7 +87,7 @@ app.patch("/posts/:id", async (req, res) => {
   }
 });
 
-//delete
+//DELETE ROUTE TO DELETE SELECTED BLOG
 app.delete("/posts/:id", async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {

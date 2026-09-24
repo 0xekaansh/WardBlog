@@ -1,0 +1,26 @@
+<%- include("partials/header.ejs") %>
+
+<div class="form-container">
+  <h1>Register</h1>
+
+  <div class="createBox main-container">
+    <form id="registerForm" method="post" action="/register">
+      <div>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" placeholder="Choose a username" required />
+      </div>
+
+      <div>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" placeholder="name@example.com" required />
+      </div>
+
+      <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="••••••••" required />
+      </div>
+
+      <button type="submit">Create Account</button>
+    </form>
+  </div>
+</div>

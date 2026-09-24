@@ -17,8 +17,21 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-//homepage
-app.get("/", async (req, res) => {
+//GET ROUTE TO HOMEPAGE
+app.get("/", (req, res) => {
+  res.render("homepage.ejs");
+})
+
+app.get("/login", (req, res) => {
+  res.render("login.ejs");
+})
+
+app.get("/register", (req, res) => {
+  res.render("register.ejs");
+})
+
+//GET ROUTE TO BLOG/FEED PAGE
+app.get("/blogs", async (req, res) => {
   try {
     const response = await axios.get(`${API_URL}/posts`);
     res.render("blog.ejs", { posts: response.data });
@@ -27,22 +40,22 @@ app.get("/", async (req, res) => {
   }
 });
 
-//route to createPost-page
+//GET ROUTE TO CREATEPOST PAGE
 app.get("/new", (req, res) => {
   res.render("createPost.ejs", { heading: "New Post", submit: "Create Post" });
 });
 
-//newPost-submission
+//POST ROUTE TO SUBMIT NEW BLOG
 app.post("/api/posts", async (req, res) => {
   try {
     const response = await axios.post(`${API_URL}/posts`, req.body);
-    res.redirect("/");
+    res.redirect("/blogs");
   } catch (error) {
     res.status(500).json({ message: "Error creating post" });
   }
 });
 
-//oldPost-edit-get
+//GET ROUTE TO EDIT BLOG PAGE
 app.get("/edit/:id", async (req, res) => {
   try {
     const response = await axios.get(`${API_URL}/posts/${req.params.id}`);
@@ -56,24 +69,24 @@ app.get("/edit/:id", async (req, res) => {
   }
 });
 
-//oldPost-edit-post
+//POST ROUTE TO EDITED BLOG
 app.post("/api/posts/:id", async (req, res) => {
   try {
     const response = await axios.patch(
       `${API_URL}/posts/${req.params.id}`,
       req.body,
     );
-    res.redirect("/");
+    res.redirect("/blogs");
   } catch (error) {
     res.status(500).json({ message: "Error updating post" });
   }
 });
 
-//delete post
+//POST ROUTE TO DELETE BLOG
 app.post("/api/posts/delete/:id", async (req, res) => {
   try {
     await axios.delete(`${API_URL}/posts/${req.params.id}`);
-    res.redirect("/");
+    res.redirect("/blogs");
   } catch (error) {
     res.status(500).json({ message: "Error deleting post" });
   }
