@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import pg from "pg";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 dotenv.config();
 
@@ -18,6 +20,88 @@ const db = new pg.Pool({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+//JWT VERIFICATION MIDDLEWARE
+function verifyToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Access Denied. Please log in." });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid or expired token." });
+    }
+    req.user = decodedUser;
+    next();
+  });
+}
+
+//AUTHENTICATION ROUTES
+
+//POST ROUTE TO REGISTER
+app.post("/auth/register", async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const result = await db.query(
+      "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email",
+      [username, email, hashedPassword],
+    );
+    const user = result.rows[0];
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.status(201).json({ token, user });
+  } catch (err) {
+    if (err.code === "23505") {
+      return res
+        .status(400)
+        .json({ message: "Username or email is already taken." });
+    }
+    console.error("Registration error: ", err.stack);
+    res.status(500).json({ message: "Registration failed." });
+  }
+});
+
+//POST ROUTE TO LOGIN
+app.post("/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const result = await db.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ message: "Invalid email or password." });
+    }
+    const user = result.rows[0];
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.json({
+      token,
+      user: { id: user.id, username: user.username, email: user.email },
+    });
+  } catch (err) {
+    console.log("Login error: ", err.stack);
+    res.status(500).json({ message: "Login Failed" });
+  }
+});
+
 //GET ROUTE TO FORWARD DATA TO BLOG PAGE
 app.get("/posts", async (req, res) => {
   try {
@@ -29,13 +113,16 @@ app.get("/posts", async (req, res) => {
   }
 });
 
-//POST ROUTE TO SUBMIT NEW BLOG
-app.post("/posts", async (req, res) => {
-  const { title, content, author } = req.body;
+//POST ROUTE TO SUBMIT NEW BLOG FOR ONLY LOGGED IN USERS
+app.post("/posts", verifyToken, async (req, res) => {
+  const { title, content } = req.body;
+  const author = req.user.username;
+  const userId = req.user.id;
+
   try {
     const result = await db.query(
-      "INSERT INTO blogposts (title, content, author) VALUES ($1, $2, $3) RETURNING *",
-      [title, content, author],
+      "INSERT INTO blogposts (title, content, author, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [title, content, author, userId],
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -64,21 +151,23 @@ app.get("/posts/:id", async (req, res) => {
   }
 });
 
-//PATCH ROUTE TO SUBMIT EDITED BLOG
-app.patch("/posts/:id", async (req, res) => {
+//PATCH ROUTE TO SUBMIT EDITED BLOG FOR LOGGED IN USERS ONLY
+app.patch("/posts/:id", verifyToken, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
     return res.status(400).json({ message: "Invalid post ID format." });
   }
 
-  const { title, content, author } = req.body;
+  const { title, content } = req.body;
+  const userId = req.user.id;
+
   try {
     const result = await db.query(
-      "UPDATE blogposts SET title = COALESCE($1,title), content = COALESCE($2, content), author = COALESCE($3, author) WHERE id = $4 RETURNING *",
-      [title, content, author, id],
+      "UPDATE blogposts SET title = COALESCE($1,title), content = COALESCE($2, content) WHERE id = $3 AND user_id = $4 RETURNING *",
+      [title, content, id, userId]
     );
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Post not found" });
+      return res.status(404).json({ message: "Unauthorized: You do not own this post." });
     }
     res.json(result.rows[0]);
   } catch (err) {
@@ -87,19 +176,24 @@ app.patch("/posts/:id", async (req, res) => {
   }
 });
 
-//DELETE ROUTE TO DELETE SELECTED BLOG
-app.delete("/posts/:id", async (req, res) => {
+//DELETE ROUTE TO DELETE SELECTED BLOG FOR LOGGED IN USER ONLY
+app.delete("/posts/:id", verifyToken, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
     return res.status(400).json({ message: "Invalid post ID format." });
   }
 
+  const userId = req.user.id;
+
   try {
-    const result = await db.query("DELETE FROM blogposts WHERE id = $1 RETURNING *", [id]);
+    const result = await db.query(
+      "DELETE FROM blogposts WHERE id = $1 AND user_id = $2 RETURNING *",
+      [id, userId],
+    );
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Post not found" });
+      return res.status(404).json({ message: "Unauthorized: You do not own this post." });
     }
-    res.json({message: "Post deleted successfully"});
+    res.json({ message: "Post deleted successfully" });
   } catch (err) {
     console.error("Failed to delete post: ", err.stack);
     res.status(500).json({ message: "Database deletion error" });
@@ -107,5 +201,5 @@ app.delete("/posts/:id", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`App listening on port: ${port}`);
+  console.log(`API listening on port: ${port}`);
 });

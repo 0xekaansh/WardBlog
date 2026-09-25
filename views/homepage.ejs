@@ -5,13 +5,19 @@
         <span class="hero-badge">Curated Archive</span>
         <h1>A Sanctuary for Considered Thought.</h1>
         <p div class="hero-subtext">Just as a wardrobe protects and holds what you value most, WardBlog is a curated archive built to shelter stories, preserve perspectives, and keep ideas safe from the noise.</p>
-
+        
         <div class="landing-actions">
+            <% if (locals.currentUser) { %>
+                <p>Welcome back, <strong><%= currentUser.username %></strong>!</p>
+                <a href="/blogs" class="btn btn-primary">Browse Blog Feed</a>
+                <a href="/new" class="btn btn-secondary">Write a Post</a>
+            <% } else { %>
                 <a href="/blogs" class="btn btn-primary">Read Articles</a>
                 <div class="auth-buttons">
                     <a href="/login" class="btn btn-secondary">Log In</a>
                     <a href="/register" class="btn btn-outline">Create Account</a>
                 </div>
+            <% } %>
         </div>
     </div>
 </div>

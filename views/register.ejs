@@ -3,6 +3,10 @@
 <div class="form-container">
   <h1>Register</h1>
 
+  <% if (locals.error) { %>
+    <p class="error-msg" style="color: var(--danger-color); margin-bottom: 1rem;"><%= error %></p>
+  <% } %>
+
   <div class="createBox main-container">
     <form id="registerForm" method="post" action="/register">
       <div>
@@ -23,4 +27,8 @@
       <button type="submit">Create Account</button>
     </form>
   </div>
+  <p style="margin-top: 1.5rem; text-align: center; color: var(--text-muted);">
+    Already have an account? <a href="/login" style="color: var(--text-primary); font-weight: 600;">Log in</a>
+  </p>
+</div>
 </div>

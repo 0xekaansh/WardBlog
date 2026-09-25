@@ -339,10 +339,3 @@ footer {
 .btn-outline:hover {
     background-color: #f5f5f5;
 }
-
-/* login page */
-
-.error-msg {
-    color: var(--danger-color);
-    margin-bottom: 1rem;
-}
