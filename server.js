@@ -127,7 +127,7 @@ app.get("/edit/:id", requireAuth, async (req, res) => {
     const response = await axios.get(`${API_URL}/posts/${req.params.id}`);
     const post = response.data;
 
-    if (post.user_id !== res.local.currentUser.id) {
+    if (post.user_id !== res.locals.currentUser.id) {
       return res.redirect("/blogs");
     }
     res.render("createPost.ejs", {
