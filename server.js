@@ -81,7 +81,7 @@ app.post("/login", async (req, res) => {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
-    res.redirect("/blogs");
+    res.redirect("/");
   } catch (error) {
     const errorMsg = error.response?.data?.message || "Login failed";
     res.render("login.ejs", { error: errorMsg });

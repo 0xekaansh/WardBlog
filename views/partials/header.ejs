@@ -8,13 +8,31 @@
   </head>
   <body>
     <header class="header">
-      <div class="header-container">
+      <nav class="navbar">
         <div class="logo"><a href="/">WardBlog</a></div>
 
-        <nav class="nav-links">
+        <div class="nav-links">
           <a href="/">Home</a>
           <a href="/blogs">Read Blogs</a>
-          <a href="/new">Create Blog</a>
-        </nav>
-      </div>
+          <% if(locals.currentUser) { %>
+            <a href="/new">Create Blog</a>
+            <div class="dropdown">
+              <button type="button" class="dropdown-toggle" aria-expanded="false">
+                <span><%= currentUser.username %></span>
+                <span class="arrow-icon">&#9662;</span>
+              </button>
+
+              <div class="dropdown-menu">
+                <a href="/profile">My Profile</a>
+                <a href="/my-posts">My Articles</a>
+                <hr class="dropdown-divider">
+                <a href="/logout" class="dropdown-item-danger">Log Out</a>
+              </div>
+            </div>
+            <% } else { %>
+              <a href="/login">Login</a>
+              <a href="/register">Register</a>
+              <% } %>
+            </div>
+    </nav>
     </header>
