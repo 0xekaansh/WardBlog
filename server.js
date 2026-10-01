@@ -1,10 +1,11 @@
-import express from "express";
+import express, { response } from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
+import { profile } from "console";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -92,6 +93,68 @@ app.post("/login", async (req, res) => {
 app.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.redirect("/");
+});
+
+//GET ROUTE TO FETCH USER PROFILE
+app.get("/profile", requireAuth, async (req, res) => {
+  try {
+    const response = await axios.get(`${API_URL}/userProfile`, {
+      headers: { Authorization: `Bearer ${req.cookies.token}` },
+    });
+    res.render("profile.ejs", { profile: response.data });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user profile" });
+  }
+});
+
+///POST ROUTE TO UPDATE USER PROFILE
+app.post("/api/updateProfile", requireAuth, async (req, res) => {
+  try {
+    const response = await axios.patch(`${API_URL}/userProfile`, req.body, {
+      headers: { Authorization: `Bearer ${req.cookies.token}` },
+    });
+    res.redirect("/profile");
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || "Update failed";
+    res
+      .status(500)
+      .render("profile.ejs", { profile: req.body, profileError: errorMsg });
+  }
+});
+
+//POST ROUTE TO UPDATE PASSWORD
+app.post("/api/changePassword", requireAuth, async (req, res) => {
+  try {
+    const response = await axios.patch(`${API_URL}/password`, req.body, {
+      headers: { Authorization: `Bearer ${req.cookies.token}` },
+    });
+    res.redirect("/profile");
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || "Update password failed";
+    try {
+      const profileResponse = await axios.get(`${API_URL}/userProfile`, {
+        headers: { Authorization: `Bearer ${req.cookies.token}` },
+      });
+      res.status(400).render("profile.ejs", {
+        profile: profileResponse.data,
+        passwordError: errorMsg,
+      });
+    } catch {
+      res.redirect("/profile");
+    }
+  }
+});
+
+//GET ROUTE TO FETCH POSTS OF LOGGED USER
+app.get("/my-posts", requireAuth, async (req, res) => {
+  try {
+    const response = await axios.get(`${API_URL}/myPosts`, {
+      headers: { Authorization: `Bearer ${req.cookies.token}` },
+    });
+    res.render("my-post.ejs", { myPosts: response.data });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching posts" });
+  }
 });
 
 //GET ROUTE TO BLOG/FEED PAGE

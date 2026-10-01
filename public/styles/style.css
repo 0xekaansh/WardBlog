@@ -444,3 +444,11 @@ footer {
 .btn-outline:hover {
     background-color: #f5f5f5;
 }
+
+/* profilepage */
+.input-readonly {
+    background-color: #f0f0f0 !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed;
+    border-color: #ddd !important;
+}

@@ -102,6 +102,83 @@ app.post("/auth/login", async (req, res) => {
   }
 });
 
+//GET ROUTE TO FETCH USER PROFILE
+app.get("/userProfile", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await db.query("SELECT * FROM users WHERE id = $1", [
+      userId,
+    ]);
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Failed to retrive user's profile: ", err.stack);
+    res.status(500).json({ message: "Database connection error" });
+  }
+});
+
+//PATCH ROUTE TO UPDATE USER PROFILE
+app.patch("/userProfile", verifyToken, async (req, res) => {
+  const { name, username, bio, email } = req.body;
+  const userId = req.user.id;
+
+  try {
+    const result = await db.query(
+      "UPDATE users SET name = COALESCE($1, name), username = COALESCE($2, username), bio = COALESCE($3, bio), email = COALESCE($4, email) WHERE id = ($5) RETURNING name, email, username, bio",
+      [name, username, bio, email, userId],
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Failed to update profile : ", err.stack);
+    res.status(500).json({ message: "Database update Error" });
+  }
+});
+
+//PATCH ROUTE TO UPDATE USER PASSWORD
+app.patch("/password", verifyToken, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.user.id;
+  try {
+    const result = await db.query(
+      "SELECT password_hash FROM users WHERE id = $1",
+      [userId],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    const currentHash = result.rows[0].password_hash
+    const isMatch = await bcrypt.compare(oldPassword, currentHash);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid old password" });
+    }
+
+    const saltRounds = 10;
+    const newHashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    await db.query(
+      "UPDATE users SET password_hash = $1 WHERE id = $2",
+      [newHashedPassword, userId],
+    );
+    res.status(201).json({message: "Password updated successfully"});
+  } catch (err) {
+    console.error("Failed to update passsword : ", err.stack);
+    res.status(500).json({ message: "Database update Error" });
+  }
+});
+
+//GET ROUTE TO FORWARD DATA TO MY-POST PAGE
+app.get("/myPosts", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await db.query(
+      "SELECT * FROM blogposts WHERE user_id = $1 ORDER BY id ASC",
+      [userId],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Failed to retrive user's posts: ", err.stack);
+    res.status(500).json({ message: "Database connection error" });
+  }
+});
+
 //GET ROUTE TO FORWARD DATA TO BLOG PAGE
 app.get("/posts", async (req, res) => {
   try {
@@ -164,10 +241,12 @@ app.patch("/posts/:id", verifyToken, async (req, res) => {
   try {
     const result = await db.query(
       "UPDATE blogposts SET title = COALESCE($1,title), content = COALESCE($2, content) WHERE id = $3 AND user_id = $4 RETURNING *",
-      [title, content, id, userId]
+      [title, content, id, userId],
     );
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Unauthorized: You do not own this post." });
+      return res
+        .status(404)
+        .json({ message: "Unauthorized: You do not own this post." });
     }
     res.json(result.rows[0]);
   } catch (err) {
@@ -191,7 +270,9 @@ app.delete("/posts/:id", verifyToken, async (req, res) => {
       [id, userId],
     );
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Unauthorized: You do not own this post." });
+      return res
+        .status(404)
+        .json({ message: "Unauthorized: You do not own this post." });
     }
     res.json({ message: "Post deleted successfully" });
   } catch (err) {

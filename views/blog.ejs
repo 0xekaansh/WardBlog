@@ -17,10 +17,6 @@
         </p>
         <div class="post-actions">
           <small>By: <%=post.author%> </small>
-          <a class="edit-btn" href="/edit/<%= post.id %>">Edit</a>
-          <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
-            <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">Delete</button>
-          </form>
         </div>
       </li>
       <% }); %>
