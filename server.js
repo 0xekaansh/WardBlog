@@ -1,11 +1,10 @@
-import express, { response } from "express";
+import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
-import { profile } from "console";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -164,6 +163,18 @@ app.get("/blogs", async (req, res) => {
     res.render("blog.ejs", { posts: response.data });
   } catch (error) {
     res.status(500).json({ message: "Error fetching posts" });
+  }
+});
+
+app.get("/blogs/:id", async (req, res) => {
+  try {
+    const response = await axios.get(`${API_URL}/posts/${req.params.id}`);
+    res.render("post.ejs", { post: response.data });
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return res.status(404).render("404.ejs", { message: "Article not found" });
+    }
+    res.status(500).json({ message: "Error fetching post" });
   }
 });
 

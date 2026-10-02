@@ -542,7 +542,7 @@ footer {
     border: 1px solid transparent;
 }
 
-.alert-msg.error {
+.alert-msg {
     background-color: #fff5f5;
     border: 1px solid #ffd8d8;
     color: var(--danger-color);
@@ -557,4 +557,78 @@ footer {
     color: var(--text-muted) !important;
     cursor: not-allowed;
     border-color: #ddd !important;
+}
+
+/* card title link on blog page*/
+.post-title-link {
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+.post-title-link:hover {
+    color: var(--accent-color);
+}
+
+.read-more-btn {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.read-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* dedicated post Page */
+.post-detail .post-header h1 {
+    font-family: var(--font-serif);
+    font-size: 2.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.post-body p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #2c2c2c;
+    white-space: pre-line;
+}
+
+.back-link {
+    margin-top: 3rem;
+}
+
+.back-link a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-link a:hover {
+    color: var(--text-primary);
+}
+
+/* new style for author details on blog/post page */
+.post-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.author-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.author-handle {
+    color: var(--text-muted);
+}
+
+.post-date {
+    color: var(--text-muted);
 }

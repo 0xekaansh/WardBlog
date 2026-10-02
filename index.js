@@ -145,7 +145,7 @@ app.patch("/password", verifyToken, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found." });
     }
-    const currentHash = result.rows[0].password_hash
+    const currentHash = result.rows[0].password_hash;
     const isMatch = await bcrypt.compare(oldPassword, currentHash);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid old password" });
@@ -153,11 +153,11 @@ app.patch("/password", verifyToken, async (req, res) => {
 
     const saltRounds = 10;
     const newHashedPassword = await bcrypt.hash(newPassword, saltRounds);
-    await db.query(
-      "UPDATE users SET password_hash = $1 WHERE id = $2",
-      [newHashedPassword, userId],
-    );
-    res.status(201).json({message: "Password updated successfully"});
+    await db.query("UPDATE users SET password_hash = $1 WHERE id = $2", [
+      newHashedPassword,
+      userId,
+    ]);
+    res.status(201).json({ message: "Password updated successfully" });
   } catch (err) {
     console.error("Failed to update passsword : ", err.stack);
     res.status(500).json({ message: "Database update Error" });
@@ -169,7 +169,7 @@ app.get("/myPosts", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const result = await db.query(
-      "SELECT * FROM blogposts WHERE user_id = $1 ORDER BY id ASC",
+      "SELECT * FROM blogposts WHERE user_id = $1 ORDER BY id DESC",
       [userId],
     );
     res.json(result.rows);
@@ -182,7 +182,20 @@ app.get("/myPosts", verifyToken, async (req, res) => {
 //GET ROUTE TO FORWARD DATA TO BLOG PAGE
 app.get("/posts", async (req, res) => {
   try {
-    const result = await db.query("SELECT * FROM blogposts ORDER BY id ASC");
+    const query = `
+        SELECT 
+          blogposts.id,
+          blogposts.title,
+          blogposts.content,
+          blogposts.date,
+          blogposts.user_id,
+          users.username,
+          COALESCE(users.name, users.username) AS display_name
+        FROM blogposts
+        LEFT JOIN users ON blogposts.user_id = users.id
+        ORDER BY blogposts.id DESC
+      `;
+    const result = await db.query(query);
     res.json(result.rows);
   } catch (err) {
     console.error("Failed to retrieve posts: ", err.stack);
@@ -215,15 +228,26 @@ app.get("/posts/:id", async (req, res) => {
     return res.status(400).json({ message: "Invalid post ID format." });
   }
   try {
-    const result = await db.query("SELECT * FROM blogposts WHERE id = $1", [
-      id,
-    ]);
+    const query = `
+      SELECT 
+        blogposts.id,
+        blogposts.title,
+        blogposts.content,
+        blogposts.date,
+        blogposts.user_id,
+        users.username,
+        COALESCE(users.name, users.username) AS display_name
+      FROM blogposts
+      LEFT JOIN users ON blogposts.user_id = users.id
+      WHERE blogposts.id = $1
+    `;
+    const result = await db.query(query, [id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Post not found" });
     }
     res.json(result.rows[0]);
   } catch (err) {
-    console.log("Failed to fetch post: ", err.stack);
+    console.error("Failed to fetch post: ", err.stack);
     res.status(500).json({ message: "Database fetch Error" });
   }
 });

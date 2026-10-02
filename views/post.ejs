@@ -1,0 +1,33 @@
+<%- include("partials/header.ejs") %>
+
+<article class="main-container post-detail">
+  <div class="post-header">
+    <h1><%= post.title %></h1>
+    <div class="post-header-meta">
+        <span class="author-name"><%= post.display_name %></span>
+        <span class="author-handle">@<%= post.username %></span>
+        <span class="post-date">
+          &bull; <%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %>
+        </span>
+      </div>
+</div>
+
+  <div class="post-body">
+    <p><%= post.content %></p>
+  </div>
+
+  <% if (locals.currentUser && currentUser.id === post.user_id) { %>
+    <div class="post-actions">
+      <a class="edit-btn" href="/edit/<%= post.id %>">Edit Article</a>
+      <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
+        <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">Delete Article</button>
+      </form>
+    </div>
+  <% } %>
+
+  <div class="back-link">
+    <a href="/blogs">&larr; Back to all articles</a>
+  </div>
+</article>
+
+<%- include("partials/footer.ejs") %>
