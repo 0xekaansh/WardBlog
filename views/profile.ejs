@@ -1,80 +1,82 @@
 <%- include("partials/header.ejs") %>
 
-<div class="profile main-container">
-  <div class="public-profile">
-    <span><h1>Public Profile</h1></span>
+<div class="profile-container main-container">
+  <div class="profile-card public-profile">
+    <div class="card-header">
+      <h1>Public Profile</h1>
+      <p class="section-desc">Manage your public information and display identity.</p>
+    </div>
     <% if (locals.profileError) { %>
-        <p class="error-msg" style="color: var(--danger-color); margin-bottom: 1rem;"><%= profileError %></p>
+        <p class="alert-msg error"><%= profileError %></p>
       <% } %>
-    <form id="edit-profile" method="post" action="/api/updateProfile">
-      <div class="profile-name">
+    <form id="edit-profile" method="post" action="/api/updateProfile" class="profile-form">
+      <div class="form-group profile-name">
         <label for="name">Name</label>
         <input
           type="text"
           id="name"
           name="name"
-          value="<%= profile.name %>"
+          value="<%= profile.name || '' %>"
           placeholder="Your Name Here"
           required
         />
       </div>
-      <div class="username">
+      <div class="form-group username">
         <label for="username">Username</label>
         <input
           type="text"
           id="username"
           name="username"
-          value="<%= profile.username %>"
+          value="<%= profile.username || '' %>"
           placeholder="Your Username Here"
           readonly
           tabindex="-1"
           class="input-readonly"
         />
-        <small style="color: var(--text-muted); font-size: 0.8rem"
-          >Usernames cannot be changed.</small
-        >
+        <small class="field-hint">Usernames cannot be changed.</small>
       </div>
-      <div class="email">
+      <div class="form-group email">
         <label for="email">Email</label>
         <input
-          type="text"
+          type="email"
           id="email"
           name="email"
-          value="<%= profile.email %>"
+          value="<%= profile.email || '' %>"
           placeholder="Your Email Here"
         />
       </div>
-      <div class="Bio">
+      <div class="form-group bio">
         <label for="bio">Bio</label>
         <textarea
           type="text"
           id="bio"
           name="bio"
-          value=""
-          placeholder="Your Bio Here"
-          required
-        >
-<%= profile.bio %></textarea
-        >
+          placeholder="Tell readers a bit about your work and tech journey..."
+        ><%= profile.bio || '' %></textarea>
       </div>
-      <button type="submit">Save</button>
+      <button type="submit" class="btn btn-primary profile-btn">Save Profile</button>
     </form>
   </div>
-  <div class="update-password">
-    <form id="new-password" method="post" action="/api/changePassword">
-        <span><h1>Change Password</h1></span>
-        <% if (locals.passwordError) { %>
-            <p class="error-msg" style="color: var(--danger-color); margin-bottom: 1rem;"><%= passwordError %></p>
-          <% } %>
-        <div class="old-password">
+  <div class="profile-card update-password">
+    <div class="card-header">
+      <h2>Change Password</h2>
+      <p class="section-desc">Update your credentials to keep your account safe.</p>
+    </div>
+
+    <% if (locals.passwordError) { %>
+      <p class="alert-msg error"><%= passwordError %></p>
+    <% } %>
+
+    <form id="new-password" method="post" action="/api/changePassword" class="profile-form">
+        <div class="form-group old-password">
             <label for="oldPassword">Old Password</label>
-            <input type="password" name="oldPassword" id="password" placeholder="Your old password here" required /> 
+            <input type="password" name="oldPassword" id="oldPassword" placeholder="Enter your current password" required /> 
         </div>
-        <div class="new-password">
+        <div class="form-group new-password">
             <label for="newPassword">New Password</label>
-            <input type="password" name="newPassword" id="password" placeholder="Your new password here" required /> 
+            <input type="password" name="newPassword" id="newPassword" placeholder="Enter a new password" required /> 
         </div>
-        <button type="submit">Update Password</button>
+        <button type="submit" class="btn btn-secondary profile-btn">Update Password</button>
     </form>
   </div>
 </div>
