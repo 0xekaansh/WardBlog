@@ -128,6 +128,9 @@ app.patch("/userProfile", verifyToken, async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
+    if (err.code === "23505") {
+      return res.status(400).json({ message: "Email is already in use." });
+    }
     console.error("Failed to update profile : ", err.stack);
     res.status(500).json({ message: "Database update Error" });
   }
@@ -168,10 +171,21 @@ app.patch("/password", verifyToken, async (req, res) => {
 app.get("/myPosts", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const result = await db.query(
-      "SELECT * FROM blogposts WHERE user_id = $1 ORDER BY id DESC",
-      [userId],
-    );
+    const query = `
+      SELECT 
+        blogposts.id,
+        blogposts.title,
+        blogposts.content,
+        blogposts.date,
+        blogposts.user_id,
+        users.username,
+        COALESCE(users.name, users.username) AS display_name
+      FROM blogposts
+      LEFT JOIN users ON blogposts.user_id = users.id
+      WHERE blogposts.user_id = $1 
+      ORDER BY blogposts.id DESC
+    `;
+    const result = await db.query(query, [userId]);
     res.json(result.rows);
   } catch (err) {
     console.error("Failed to retrive user's posts: ", err.stack);

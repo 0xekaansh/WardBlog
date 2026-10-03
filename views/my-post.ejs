@@ -1,27 +1,41 @@
 <%- include("partials/header.ejs") %>
 
 <div class="main-container">
-    <div class="main-heading"><h1>Your Posts</h1></div>
+    <div class="main-heading"><h1>Your Articles</h1></div>
   
-    <div class="posts">
-        <ul id="postsList">
+  <div class="posts">
+    <ul id="postsList">
+      <% myPosts.forEach(post=> { %>
+        <li>
+          <h2>
+            <a href="/blogs/<%= post.id %>" class="post-title-link">
+              <%=post.title%>
+            </a>
+          </h2>
 
-            <% myPosts.forEach(post=> { %>
-                <li>
-                    <h2><%=post.title%></h2>
-                    <small><%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %></small>
-                    <p><%=post.content%></p>
-                    <div class="post-actions">
-                        <small>By: <%=post.author%> </small>
-                        <a class="edit-btn" href="/edit/<%= post.id %>">Edit</a>
-                        <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
-                            <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">Delete</button>
-                        </form>
-                    </div>
-                </li>
-            <% }); %>
-        </ul>
-    </div>
+          <div class="post-header-meta">
+            <span class="author-name"><%= post.display_name %></span>
+            <span class="author-handle">@<%= post.username %></span>
+            <span class="post-date">
+              &bull; <%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %>
+            </span>
+          </div>
+
+          <p class="post-preview">
+            <%= post.content.length > 160 ? post.content.substring(0, 160) + '...' : post.content %>
+          </p>
+
+          <a href="/blogs/<%= post.id %>" class="read-more-btn">Read Article &rarr;</a>
+          <div class="post-actions">
+            <a class="edit-btn" href="/edit/<%= post.id %>">Edit Article</a>
+            <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
+              <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">Delete Article</button>
+            </form>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
 </div>
 
 <%- include("partials/footer.ejs") %>

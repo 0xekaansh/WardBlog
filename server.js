@@ -60,6 +60,8 @@ app.post("/register", async (req, res) => {
     const response = await axios.post(`${API_URL}/auth/register`, req.body);
     res.cookie("token", response.data.token, {
       httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.redirect("/blogs");
@@ -79,6 +81,8 @@ app.post("/login", async (req, res) => {
     const response = await axios.post(`${API_URL}/auth/login`, req.body);
     res.cookie("token", response.data.token, {
       httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.redirect("/");

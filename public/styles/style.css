@@ -29,7 +29,7 @@ body {
 }
 
 /* header */
-header {
+header.header {
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
