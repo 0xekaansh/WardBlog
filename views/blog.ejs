@@ -14,8 +14,10 @@
           </h2>
 
           <div class="post-header-meta">
-            <span class="author-name"><%= post.display_name %></span>
-            <span class="author-handle">@<%= post.username %></span>
+            <a href="/publicProfile/<%= post.user_id %>">
+              <span class="author-name"><%= post.display_name %></span>
+              <span class="author-handle">@<%= post.username %></span>
+            </a>
             <span class="post-date">
               &bull; <%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %>
             </span>

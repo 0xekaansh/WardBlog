@@ -148,6 +148,16 @@ app.post("/api/changePassword", requireAuth, async (req, res) => {
   }
 });
 
+//GET ROUTE TO SHOW PUBLIC PROOFILE
+app.get("/publicProfile/:user_id", async (req, res) => {
+  try {
+    const response = await axios.get(`${API_URL}/userProfile/${req.params.user_id}`);
+    res.render("publicProfile.ejs", { publicProfile: response.data });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user's public profile" });
+  }
+});
+
 //GET ROUTE TO FETCH POSTS OF LOGGED USER
 app.get("/my-posts", requireAuth, async (req, res) => {
   try {
@@ -176,7 +186,9 @@ app.get("/blogs/:id", async (req, res) => {
     res.render("post.ejs", { post: response.data });
   } catch (error) {
     if (error.response?.status === 404) {
-      return res.status(404).render("404.ejs", { message: "Article not found" });
+      return res
+        .status(404)
+        .render("404.ejs", { message: "Article not found" });
     }
     res.status(500).json({ message: "Error fetching post" });
   }

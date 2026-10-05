@@ -54,6 +54,36 @@
           placeholder="Tell readers a bit about your work and tech journey..."
         ><%= profile.bio || '' %></textarea>
       </div>
+      <div class="form-group github">
+        <label for="github">Github</label>
+        <input
+          type="url"
+          id="github"
+          name="github"
+          value="<%= profile.github || '' %>"
+          placeholder="Add Your Github Profile Link Here"
+        />
+      </div>
+      <div class="form-group linkedin">
+        <label for="linkedin">LinkedIn</label>
+        <input
+          type="url"
+          id="linkedin"
+          name="linkedin"
+          value="<%= profile.linkedin || '' %>"
+          placeholder="Add Your linkedin Profile Link Here"
+        />
+      </div>
+      <div class="form-group instagram">
+        <label for="instagram">Instagram</label>
+        <input
+          type="url"
+          id="instagram"
+          name="instagram"
+          value="<%= profile.instagram || '' %>"
+          placeholder="Add Your Instagram Profile Link Here"
+        />
+      </div>
       <button type="submit" class="btn btn-primary profile-btn">Save Profile</button>
     </form>
   </div>

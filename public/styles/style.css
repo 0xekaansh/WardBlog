@@ -620,6 +620,16 @@ footer {
     font-size: 0.9rem;
 }
 
+.post-header-meta a {
+    text-decoration: none;
+    display: inline-flex;
+    gap: 0.4rem;
+}
+
+.post-header-meta a:hover .author-name {
+    text-decoration: underline;
+}
+
 .author-name {
     font-weight: 600;
     color: var(--text-primary);
@@ -631,4 +641,125 @@ footer {
 
 .post-date {
     color: var(--text-muted);
+}
+
+/* public profile page */
+.public-profile-container {
+    max-width: 720px;
+    margin: 3rem auto;
+}
+
+.author-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+/* Monogram Avatar */
+.author-avatar-placeholder {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: #ffffff;
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.author-info {
+    flex: 1;
+}
+
+.author-display-name {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.2rem;
+}
+
+.author-info .author-handle {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.author-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+}
+
+.author-bio {
+    font-size: 1.05rem;
+    color: #333333;
+    line-height: 1.7;
+    white-space: pre-line;
+    margin-bottom: 1.75rem;
+}
+
+.author-bio.empty-bio {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+/* socials */
+.contact-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.25rem;
+}
+
+.contact-section h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #fafafa;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.social-btn:hover {
+    background: #ffffff;
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.social-btn img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    border-radius: 2px;
 }

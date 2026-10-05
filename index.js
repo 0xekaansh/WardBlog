@@ -118,13 +118,21 @@ app.get("/userProfile", verifyToken, async (req, res) => {
 
 //PATCH ROUTE TO UPDATE USER PROFILE
 app.patch("/userProfile", verifyToken, async (req, res) => {
-  const { name, username, bio, email } = req.body;
+  const { name, username, bio, email, github, instagram, linkedin } = req.body;
   const userId = req.user.id;
 
   try {
     const result = await db.query(
-      "UPDATE users SET name = COALESCE($1, name), username = COALESCE($2, username), bio = COALESCE($3, bio), email = COALESCE($4, email) WHERE id = ($5) RETURNING name, email, username, bio",
-      [name, username, bio, email, userId],
+      `UPDATE users SET 
+      name = COALESCE($1, name), 
+      username = COALESCE($2, username), 
+      bio = COALESCE($3, bio), 
+      email = COALESCE($4, email), 
+      github = COALESCE($5, github), 
+      instagram = COALESCE($6, instagram),
+      linkedin = COALESCE($7, linkedin)
+      WHERE id = ($8) RETURNING name, email, username, bio, github, instagram, linkedin`,
+      [name, username, bio, email, github, instagram, linkedin, userId],
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -164,6 +172,28 @@ app.patch("/password", verifyToken, async (req, res) => {
   } catch (err) {
     console.error("Failed to update passsword : ", err.stack);
     res.status(500).json({ message: "Database update Error" });
+  }
+});
+
+//GET ROUTE TO FORWARD PUBLIC PROFILE DATA
+app.get("/userProfile/:user_id", async (req, res) => {
+  const user_id = parseInt(req.params.user_id, 10);
+  if (isNaN(user_id)) {
+    return res.status(400).json({ message: "Invalid user ID format." });
+  }
+
+  try {
+    const result = await db.query(
+      `SELECT name, username, bio, created_at, github, instagram, linkedin FROM users WHERE id = $1`,
+      [user_id],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User profile not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Failed to fetch user profile: ", err.stack);
+    res.status(500).json({ message: "Database fetch Error" });
   }
 });
 

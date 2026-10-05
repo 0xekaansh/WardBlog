@@ -13,6 +13,9 @@ name VARCHAR(100) NOT NULL,
 username VARCHAR(50) UNIQUE NOT NULL,
 email VARCHAR(255) UNIQUE NOT NULL,
 bio TEXT,
+github TEXT,
+instagram TEXT,
+linkedin TEXT,
 password_hash VARCHAR(255) NOT NULL,
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

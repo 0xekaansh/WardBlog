@@ -1,0 +1,58 @@
+<%- include("partials/header.ejs") %>
+
+<main class="main-container public-profile-container">
+  <div class="author-card">
+    <div class="author-avatar-placeholder">
+      <%= (publicProfile.name || publicProfile.username).charAt(0).toUpperCase() %>
+    </div>
+
+    <div class="author-info">
+      <h1 class="author-display-name"><%= publicProfile.name || publicProfile.username %></h1>
+      <span class="author-handle">@<%= publicProfile.username %></span>
+      
+      <p class="author-meta">
+        Joined WardBlog on <%= new Date(publicProfile.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) %>
+      </p>
+
+      <% if (publicProfile.bio) { %>
+        <p class="author-bio"><%= publicProfile.bio %></p>
+      <% } else { %>
+        <p class="author-bio empty-bio">This author has not written a bio yet.</p>
+      <% } %>
+
+      <% if (publicProfile.github || publicProfile.linkedin || publicProfile.instagram) { %>
+        <div class="contact-section">
+          <h3>Connect</h3>
+          <div class="social-links">
+            <% if (publicProfile.github) { %>
+              <a href="<%= publicProfile.github %>" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub">
+                <img src="/images/GitHub_Invertocat_Black.png" alt="GitHub" />
+                <span>GitHub</span>
+              </a>
+            <% } %>
+
+            <% if (publicProfile.linkedin) { %>
+              <a href="<%= publicProfile.linkedin %>" target="_blank" rel="noopener noreferrer" class="social-btn" title="LinkedIn">
+                <img src="/images/LI-In-Bug.png" alt="LinkedIn" />
+                <span>LinkedIn</span>
+              </a>
+            <% } %>
+
+            <% if (publicProfile.instagram) { %>
+              <a href="<%= publicProfile.instagram %>" target="_blank" rel="noopener noreferrer" class="social-btn" title="Instagram">
+                <img src="/images/Instagram_Glyph_Gradient.png" alt="Instagram" />
+                <span>Instagram</span>
+              </a>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="/blogs">&larr; Back to all articles</a>
+  </div>
+</main>
+
+<%- include("partials/footer.ejs") %>
