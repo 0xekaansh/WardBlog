@@ -151,8 +151,13 @@ app.post("/api/changePassword", requireAuth, async (req, res) => {
 //GET ROUTE TO SHOW PUBLIC PROOFILE
 app.get("/publicProfile/:user_id", async (req, res) => {
   try {
-    const response = await axios.get(`${API_URL}/userProfile/${req.params.user_id}`);
-    res.render("publicProfile.ejs", { publicProfile: response.data });
+    const response = await axios.get(
+      `${API_URL}/userProfile/${req.params.user_id}`,
+    );
+    res.render("publicProfile.ejs", {
+      publicProfile: response.data.profile,
+      authorPosts: response.data.posts,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching user's public profile" });
   }

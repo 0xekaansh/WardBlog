@@ -1,6 +1,11 @@
 <%- include("partials/header.ejs") %>
 
 <main class="main-container public-profile-container">
+    
+  <div class="back-link">
+    <a href="/blogs">&larr; Back to all articles</a>
+  </div>
+
   <div class="author-card">
     <div class="author-avatar-placeholder">
       <%= (publicProfile.name || publicProfile.username).charAt(0).toUpperCase() %>
@@ -50,9 +55,43 @@
     </div>
   </div>
 
-  <div class="back-link">
-    <a href="/blogs">&larr; Back to all articles</a>
-  </div>
+  <!-- posts -->
+  <section class="author-posts-section">
+    <div class="section-title">
+      <h2>Articles by <%= publicProfile.name || publicProfile.username %></h2>
+      <span class="article-count"><%= authorPosts.length %> <%= authorPosts.length === 1 ? 'article' : 'articles' %></span>
+    </div>
+
+    <% if (authorPosts.length > 0) { %>
+      <ul id="postsList">
+        <% authorPosts.forEach(post => { %>
+          <li>
+            <h2>
+              <a href="/blogs/<%= post.id %>" class="post-title-link">
+                <%= post.title %>
+              </a>
+            </h2>
+
+            <div class="post-header-meta">
+              <span class="post-date">
+                Published on <%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %>
+              </span>
+            </div>
+
+            <p class="post-preview">
+              <%= post.content.length > 160 ? post.content.substring(0, 160) + '...' : post.content %>
+            </p>
+
+            <a href="/blogs/<%= post.id %>" class="read-more-btn">Read Article &rarr;</a>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <div class="empty-post-box">
+        <p>This author hasn't published any articles yet.</p>
+      </div>
+    <% } %>
+  </section>
 </main>
 
 <%- include("partials/footer.ejs") %>

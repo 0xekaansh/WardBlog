@@ -763,3 +763,39 @@ footer {
     object-fit: contain;
     border-radius: 2px;
 }
+
+/* author articles section on public profile page*/
+.author-posts-section {
+    margin-top: 3rem;
+}
+
+.author-posts-section .section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.author-posts-section .section-title h2 {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.author-posts-section .article-count {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.empty-post-box {
+    background: var(--card-bg);
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2.5rem;
+    text-align: center;
+    color: var(--text-muted);
+}
