@@ -1,44 +1,69 @@
 <%- include("partials/header.ejs") %>
 
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+
 <div class="form-container">
   <h1><%= heading %></h1>
-
-  <% if (locals.post) { %>
-    <div class="createBox main-container">
-      <form id="editBlogForm" method="post" action="/api/posts/<%= post.id %>">
-        <div class="blog-title">
-          <label for="title">Title</label>
-          <input type="text" name="title" placeholder="Blog Title" value="<%= post.title %>" required />
-        </div>
-        <div class="blog-content">
-          <label for="content">Content</label>
-          <textarea name="content" rows="5" placeholder="Blog Content" required ><%= post.content %></textarea>
-        </div>
-        <div class="blog-author">
-          <label for="author">Author</label>
-          <input type="text" name="author" placeholder="Author Name" value="<%= post.author %>" required />
-        </div>
-        <button type="submit"><%= submit %></button>
-      </form>
-    </div>
-    <% } else { %>
-      <div class="createBox main-container">
-        <form id="newBlogForm" method="post" action="/api/posts">
-          <div class="blog-title">
-            <label for="title">Title</label>
-            <input type="text" name="title" placeholder="Blog Title" required />
-          </div>
-          <div class="blog-content">
-            <label for="content">Content</label>
-            <textarea name="content" rows="5" placeholder="Blog Content" required ></textarea>
-          </div>
-          <div class="blog-author">
-            <label for="author">Author</label>
-            <input type="text" name="author" placeholder="Author Name" required />
-          </div>
-          <button type="submit"><%= submit %></button>
-        </form>
+  <div class="createBox">
+    <form action="<%= typeof post !== 'undefined' ? '/api/posts/' + post.id : '/api/posts' %>" method="POST" id="postForm">
+      <div>
+        <label for="title">Title</label>
+        <input 
+          type="text" 
+          id="title" 
+          name="title" 
+          placeholder="Enter blog title here..." 
+          value="<%= typeof post !== 'undefined' ? post.title : '' %>" 
+          required 
+        />
       </div>
-      <% } %>
+
+      <div class="quill-container">
+        <label for="content-editor">Content</label>
+        <!-- quill.js editor container -->
+        <div id="editor-container">
+          <%- typeof post !== 'undefined' ? post.content : '' %>
+        </div>
+        <!-- hidden input to link quill editor data to content before form submission -->
+        <input type="hidden" name="content" id="contentInput" />
+      </div>
+
+      <button type="submit" class="btn btn-primary"><%= submit %></button>
+    </form>
+  </div>
 </div>
+
+<!-- quill.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+<script>
+  const quill = new Quill('#editor-container', {
+    theme: 'snow',
+    placeholder: 'Enter blog content here...',
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, 3, false] }, 
+        'bold', 'italic', 'underline', 'strike', 
+        'code', 
+        'blockquote', 
+        { 'list': 'ordered' }, 
+        { 'list': 'bullet' },
+        'link', 
+        'clean']
+      ]
+    }
+  });
+
+  const form = document.getElementById('postForm');
+  const contentInput = document.getElementById('contentInput');
+
+  form.addEventListener('submit', function (e) {
+    contentInput.value = quill.getSemanticHTML();
+    
+    if (quill.getText().trim().length === 0) {
+      e.preventDefault();
+      alert('Article content cannot be empty.');
+    }
+  });
+</script>
 <%- include("partials/footer.ejs") %>

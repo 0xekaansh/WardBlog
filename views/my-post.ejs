@@ -21,8 +21,14 @@
             </span>
           </div>
 
+          <% const cleanSnippet = post.content ? post.content
+          .replace(/<br\s*[\/]?>/gi, ' ')
+          .replace(/<\/(p|li|h[1-6]|blockquote)>/gi, ' ')
+          .replace(/<[^>]+>/g, '')
+          .replace(/\s+/g, ' ')
+          .trim() : ''; %>
           <p class="post-preview">
-            <%= post.content.length > 160 ? post.content.substring(0, 160) + '...' : post.content %>
+            <%= cleanSnippet.length > 180 ? cleanSnippet.substring(0, 180) + '...' : cleanSnippet %>
           </p>
 
           <a href="/blogs/<%= post.id %>" class="read-more-btn">Read Article &rarr;</a>

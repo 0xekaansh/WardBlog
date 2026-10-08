@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import pg from "pg";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import sanitizeHtml from "sanitize-html";
 
 dotenv.config();
 
@@ -16,6 +17,13 @@ const db = new pg.Pool({
   password: process.env.PG_PASSWORD,
   port: process.env.PG_PORT,
 });
+
+const sanitizeOptions = {
+  allowedTags: ["b", "i", "em", "strong", "u", "s", "strike", "h1", "h2", "h3", "p", "blockquote", "ul", "ol", "li", "a", "br"],
+  allowedAttributes: {
+    a: ["href", "target", "rel"]
+  }
+};
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -267,10 +275,12 @@ app.post("/posts", verifyToken, async (req, res) => {
   const author = req.user.username;
   const userId = req.user.id;
 
+  const cleanContent = sanitizeHtml(content || "", sanitizeOptions);
+
   try {
     const result = await db.query(
       "INSERT INTO blogposts (title, content, author, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
-      [title, content, author, userId],
+      [title, cleanContent, author, userId],
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -320,10 +330,12 @@ app.patch("/posts/:id", verifyToken, async (req, res) => {
   const { title, content } = req.body;
   const userId = req.user.id;
 
+  const cleanContent = content !== undefined ? sanitizeHtml(content, sanitizeOptions) : undefined;
+
   try {
     const result = await db.query(
       "UPDATE blogposts SET title = COALESCE($1,title), content = COALESCE($2, content) WHERE id = $3 AND user_id = $4 RETURNING *",
-      [title, content, id, userId],
+      [title, cleanContent, id, userId],
     );
     if (result.rows.length === 0) {
       return res
