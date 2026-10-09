@@ -18,8 +18,17 @@ const db = new pg.Pool({
   port: process.env.PG_PORT,
 });
 
+function cleanIncomingHTML(rawContent) {
+  if (!rawContent) return "";
+  return rawContent
+    .replace(/&nbsp;/g, " ")
+    .replace(/\u00a0/g, " ")
+    .replace(/\r?\n|\r/g, " ")
+    .replace(/\s+/g, " ");
+}
+
 const sanitizeOptions = {
-  allowedTags: ["b", "i", "em", "strong", "u", "s", "strike", "h1", "h2", "h3", "p", "blockquote", "ul", "ol", "li", "a", "br"],
+  allowedTags: ["b", "i", "em", "strong", "u", "s", "strike", "h1", "h2", "h3", "p", "code", "blockquote", "ul", "ol", "li", "a", "br"],
   allowedAttributes: {
     a: ["href", "target", "rel"]
   }
@@ -275,7 +284,8 @@ app.post("/posts", verifyToken, async (req, res) => {
   const author = req.user.username;
   const userId = req.user.id;
 
-  const cleanContent = sanitizeHtml(content || "", sanitizeOptions);
+  const normalized = cleanIncomingHTML(content);
+  const cleanContent = sanitizeHtml(normalized || "", sanitizeOptions);
 
   try {
     const result = await db.query(
@@ -330,7 +340,8 @@ app.patch("/posts/:id", verifyToken, async (req, res) => {
   const { title, content } = req.body;
   const userId = req.user.id;
 
-  const cleanContent = content !== undefined ? sanitizeHtml(content, sanitizeOptions) : undefined;
+  const normalized = cleanIncomingHTML(content);
+  const cleanContent = normalized !== undefined ? sanitizeHtml(normalized, sanitizeOptions) : undefined;
 
   try {
     const result = await db.query(
