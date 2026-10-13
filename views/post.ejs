@@ -1,10 +1,40 @@
 <%- include("partials/header.ejs") %>
 
 <article class="main-container post-detail">
+  <div class="action-bar">
+    <div class="back-link">
+      <a href="/blogs">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg> Back to all articles</a>
+    </div>
+    
+    <% if (locals.currentUser && currentUser.id === post.user_id) { %>
+      <div class="post-actions">
+        <a class="edit-btn" href="/edit/<%= post.id %>">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg> Edit Article</a>
+        <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
+          <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg> Delete Article</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+
   <div class="post-header">
     <h1><%= post.title %></h1>
     <div class="post-header-meta">
-      <a href="/publicProfile/<%= post.user_id %>">
+      <p>By</p>
+      <a href="/publicProfile/<%= post.username %>">
         <span class="author-name"><%= post.display_name %></span>
         <span class="author-handle">@<%= post.username %></span>
       </a>
@@ -12,24 +42,12 @@
           &bull; <%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %>
         </span>
       </div>
-</div>
+  </div>
 
   <div class="post-body">
     <%- post.content %>
   </div>
 
-  <% if (locals.currentUser && currentUser.id === post.user_id) { %>
-    <div class="post-actions">
-      <a class="edit-btn" href="/edit/<%= post.id %>">Edit Article</a>
-      <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
-        <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">Delete Article</button>
-      </form>
-    </div>
-  <% } %>
-
-  <div class="back-link">
-    <a href="/blogs">&larr; Back to all articles</a>
-  </div>
 </article>
 
 <%- include("partials/footer.ejs") %>

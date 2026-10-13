@@ -44,7 +44,8 @@
       toolbar: [
         [{ 'header': [1, 2, 3, false] }, 
         'bold', 'italic', 'underline', 'strike', 
-        'code', 
+        'code',
+        'code-block',
         'blockquote', 
         { 'list': 'ordered' }, 
         { 'list': 'bullet' },
@@ -52,6 +53,38 @@
         'clean']
       ]
     }
+  });
+
+  // toolbar customization
+  const toolbar = quill.getModule('toolbar');
+  
+  // inline code button
+  const codeButton = toolbar.container.querySelector('.ql-code');
+  if (codeButton) {
+    codeButton.innerHTML = `<svg viewBox="0 0 18 18"><polyline class="ql-stroke" points="5 3 1 9 5 15"></polyline><polyline class="ql-stroke" points="13 3 17 9 13 15"></polyline></svg>`;
+  }
+
+  // code block button
+  const codeBlockButton = toolbar.container.querySelector('.ql-code-block');
+  if (codeBlockButton) {
+    codeBlockButton.innerHTML = `<svg viewBox="0 0 18 18"><path class="ql-stroke" d="M3,5 L6,9 L3,13"></path><path class="ql-stroke" d="M15,5 L12,9 L15,13"></path><line class="ql-stroke" x1="10" y1="3" x2="8" y2="15"></line></svg>`;
+  }
+  
+  const tooltips = {
+    'ql-bold': 'Bold',
+    'ql-italic': 'Italic',
+    'ql-underline': 'Underline',
+    'ql-strike': 'Strikethrough',
+    'ql-code': 'Inline Code',
+    'ql-code-block': 'Code Block',
+    'ql-blockquote': 'Blockquote',
+    'ql-link': 'Insert Link',
+    'ql-clean': 'Clear Formatting'
+  };
+
+  Object.keys(tooltips).forEach(className => {
+    const btn = toolbar.container.querySelector('.' + className);
+    if (btn) btn.setAttribute('title', tooltips[className]);
   });
 
   const form = document.getElementById('postForm');

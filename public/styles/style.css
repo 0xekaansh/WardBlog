@@ -5,7 +5,7 @@
     --card-bg: #ffffff;
     --text-primary: #1a1a1a;
     --text-muted: #666666;
-    --border-color: #e5e5e5;
+    --border-color: #c3bcbc;
     --accent-color: #242424;
     --danger-color: #c92a2a;
     --font-serif: "Domine", Georgia, serif;
@@ -175,7 +175,7 @@ header.header {
 
 /* blog/main */
 .main-container {
-    max-width: 800px;
+    max-width: 1000px;
     width: 100%;
     margin: 2rem auto;
     padding: 0 1.5rem;
@@ -233,57 +233,25 @@ header.header {
     white-space: pre-line;
 }
 
-/* author & action bar */
-.post-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
-}
 
-.edit-btn,
-.delete-btn {
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.4rem 0.85rem;
-    border-radius: 6px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
 
-.edit-btn {
-    color: var(--text-primary);
-    background-color: #efefef;
-    border: 1px solid transparent;
-}
-
-.edit-btn:hover {
-    background-color: #e0e0e0;
-}
-
-.delete-btn {
-    background: none;
-    border: 1px solid #ffd8d8;
-    color: var(--danger-color);
-}
-
-.delete-btn:hover {
-    background-color: #fff5f5;
-    border-color: var(--danger-color);
-}
-
-/* form container (create/edit) */
-
+/* form container (create/edit/login/register) */
 .form-container {
-    max-width: 680px;
+    max-width: 1100px;
     width: 100%;
     margin: 2rem auto;
     padding: 0 1.5rem;
     flex: 1;
+}
+
+.form-container.login,
+.form-container.register {
+    max-width: 680px;
+}
+
+.form-container.login h1,
+.form-container.register h1 {
+    padding-left: 1.4rem;
 }
 
 .form-container h1 {
@@ -373,7 +341,9 @@ header.header {
 
 .ql-toolbar.ql-snow .ql-formats {
     display: grid;
-    grid-template-columns: repeat(11, 1fr);
+    grid-template-columns: repeat(12, 1fr);
+    overflow: auto;
+    padding: 0.45rem;
     align-items: center;
 }
 
@@ -387,6 +357,7 @@ header.header {
     border-top: none !important;
     border-radius: 0 0 8px 8px !important;
     min-height: 240px;
+    max-height: 480px;
     font-family: var(--font-sans);
     font-size: 1rem;
     transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -568,6 +539,38 @@ header.header {
     background-color: #f5f5f5;
 }
 
+/* homepage recent post section */
+.recent-posts-section {
+    margin-top: 2rem;
+}
+
+.recent-posts-section .section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+}
+
+.recent-posts-section .section-title h2 {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.view-all-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+    color: var(--text-primary);
+}
+
 /* profilepage */
 .profile-container {
     max-width: 680px;
@@ -707,100 +710,123 @@ header.header {
 }
 
 /* dedicated post Page */
+.post-detail {
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    min-width: 1100px;
+}
+
+/* action bar on post page */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.back-link.publicProfile {
+    margin-bottom: 1rem;
+}
+
+.back-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: var(--bg-color);
+    line-height: 1.6;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--accent-color);
+    border-radius: 20px;
+}
+
+.back-link a:hover {
+    background-color: var(--accent-color);
+    color: var(--card-bg);
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.post-actions.myPosts {
+    margin-top: 1rem;
+}
+
+.edit-btn,
+.delete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    line-height: 1.6;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+
+
+.edit-btn {
+    color: var(--text-primary);
+    background-color: var(--bg-color);
+    border: 1px solid var(--accent-color);
+}
+
+.edit-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--card-bg);
+}
+
+.delete-btn {
+    color: var(--danger-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--danger-color);
+}
+
+.delete-btn:hover {
+    background-color: var(--danger-color);
+    color: var(--card-bg);
+}
+
+.post-detail .post-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
 .post-detail .post-header h1 {
     font-family: var(--font-serif);
     font-size: 2.6rem;
     margin-bottom: 0.5rem;
 }
 
-.post-body {
-    font-size: 1.15rem;
-    line-height: 1.8;
-    color: #2c2c2c;
-}
-
-.post-body p {
-    font-size: 1.15rem;
-    line-height: 1.8;
-    color: #2c2c2c;
-    margin-bottom: 1.4rem;
-}
-
-/* headings generated by Quill */
-.post-body h1,
-.post-body h2, 
-.post-body h3 {
-    font-family: var(--font-serif);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    line-height: 1;
-}
-
-/* lists generated by Quill */
-.post-body ul {
-    margin: 1.25rem 0 1.5rem 1.75rem;
-}
-
-.post-body ol {
-    margin: 1.25rem 0 1.5rem 1.75rem;
-}
-
-.post-body li {
-    margin-bottom: 0.5rem;
-    line-height: 1.7;
-}
-
-/* blockquotes & code generated by Quill */
-.post-body blockquote {
-    border-left: 3px solid var(--accent-color);
-    padding: 0.5rem 0 0.5rem 1.25rem;
-    margin: 1.5rem 0;
-    color: var(--text-muted);
-    font-style: italic;
-}
-
-.post-body code {
-    background-color: #f2f2f2;
-    padding: 0.15rem 0.35rem;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 0.9em;
-}
-
-.post-body pre {
-    background-color: #242424;
-    color: #f8f8f8;
-    padding: 1rem 1.25rem;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-family: monospace;
-    font-size: 0.95rem;
-    margin: 1.25rem 0 1.5rem;
-}
-
-.back-link {
-    margin-top: 3rem;
-}
-
-.back-link a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.back-link a:hover {
-    color: var(--text-primary);
-}
-
-/* new style for author details on blog/post page */
 .post-header-meta {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
     font-size: 0.9rem;
+}
+
+.post-header-meta p {
+    font-weight: 600;
 }
 
 .post-header-meta a {
@@ -826,9 +852,78 @@ header.header {
     color: var(--text-muted);
 }
 
+/* content generated by Quill.js on post page */
+.post-body {
+    padding: 1rem;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #2c2c2c;
+}
+
+.post-body p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #2c2c2c;
+    margin-bottom: 1rem;
+}
+
+.post-body h1,
+.post-body h2,
+.post-body h3 {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    line-height: 1;
+}
+
+.post-body ul {
+    margin: 1.25rem 0 1.5rem 1.75rem;
+}
+
+.post-body ol {
+    margin: 1.25rem 0 1.5rem 1.75rem;
+}
+
+.post-body li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+}
+
+.post-body blockquote {
+    border-left: 3px solid var(--accent-color);
+    padding: 0.5rem 0 0.5rem 1.25rem;
+    margin: 1.5rem 0;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.post-body code {
+    background-color: #a5bccada;
+    color: var(--accent-color);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.post-body pre {
+    background-color: var(--accent-color);
+    color: #f8f8f8;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.95rem;
+    margin: 1.25rem 0 1.5rem;
+}
+
+
+
 /* public profile page */
 .public-profile-container {
-    max-width: 720px;
+    max-width: 1000px;
     margin: 3rem auto;
 }
 

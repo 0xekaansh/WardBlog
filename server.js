@@ -45,9 +45,15 @@ function requireAuth(req, res, next) {
   next();
 }
 
-//GET ROUTE TO HOMEPAGE
-app.get("/", (req, res) => {
-  res.render("homepage.ejs");
+//GET ROUTE TO HOMEPAGE WITH RECENT POSTS
+app.get("/", async (req, res) => {
+  try {
+    const response = await axios.get(`${API_URL}/posts/recent`);
+    res.render("homepage.ejs", { recentPosts: response.data });
+  } catch (error) {
+    console.error("Error loading homepage posts:", error.message);
+    res.render("homepage.ejs", { recentPosts: [] });
+  }
 });
 
 //REGISTER PAGES
@@ -149,10 +155,10 @@ app.post("/api/changePassword", requireAuth, async (req, res) => {
 });
 
 //GET ROUTE TO SHOW PUBLIC PROOFILE
-app.get("/publicProfile/:user_id", async (req, res) => {
+app.get("/publicProfile/:username", async (req, res) => {
   try {
     const response = await axios.get(
-      `${API_URL}/userProfile/${req.params.user_id}`,
+      `${API_URL}/userProfile/${req.params.username}`,
     );
     res.render("publicProfile.ejs", {
       publicProfile: response.data.profile,
@@ -255,7 +261,7 @@ app.post("/api/posts/delete/:id", requireAuth, async (req, res) => {
     await axios.delete(`${API_URL}/posts/${req.params.id}`, {
       headers: { Authorization: `Bearer ${req.cookies.token}` },
     });
-    res.redirect("/blogs");
+    res.redirect("/my-posts");
   } catch (error) {
     res.status(500).json({ message: "Error deleting post" });
   }

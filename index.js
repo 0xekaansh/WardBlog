@@ -20,15 +20,30 @@ const db = new pg.Pool({
 
 function cleanIncomingHTML(rawContent) {
   if (!rawContent) return "";
-  return rawContent
+
+  let cleaned = rawContent
     .replace(/&nbsp;/g, " ")
-    .replace(/\u00a0/g, " ")
+    .replace(/\u00a0/g, " ");
+
+  const preBlocks = [];
+  cleaned = cleaned.replace(/<pre[\s\S]*?<\/pre>/gi, (match) => {
+    preBlocks.push(match);
+    return `__PRE_BLOCK_${preBlocks.length - 1}__`;
+  });
+
+  cleaned = cleaned
     .replace(/\r?\n|\r/g, " ")
     .replace(/\s+/g, " ");
+
+  preBlocks.forEach((block, index) => {
+    cleaned = cleaned.replace(`__PRE_BLOCK_${index}__`, block);
+  });
+
+  return cleaned;
 }
 
 const sanitizeOptions = {
-  allowedTags: ["b", "i", "em", "strong", "u", "s", "strike", "h1", "h2", "h3", "p", "code", "blockquote", "ul", "ol", "li", "a", "br"],
+  allowedTags: ["b", "i", "em", "strong", "u", "s", "strike", "h1", "h2", "h3", "p", "code", "blockquote", "pre", "ul", "ol", "li", "a", "br"],
   allowedAttributes: {
     a: ["href", "target", "rel"]
   }
@@ -54,6 +69,31 @@ function verifyToken(req, res, next) {
     next();
   });
 }
+
+//GET ROUTE TO FETCH RECENT POSTS FOR HOMEPAGE
+app.get("/posts/recent", async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        blogposts.id,
+        blogposts.title,
+        blogposts.content,
+        blogposts.date,
+        blogposts.user_id,
+        users.username,
+        COALESCE(users.name, users.username) AS display_name
+      FROM blogposts
+      LEFT JOIN users ON blogposts.user_id = users.id
+      ORDER BY blogposts.id DESC
+      LIMIT 5
+    `;
+    const result = await db.query(query);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Failed to retrieve recent posts: ", err.stack);
+    res.status(500).json({ message: "Database connection error" });
+  }
+});
 
 //AUTHENTICATION ROUTES
 
@@ -193,33 +233,27 @@ app.patch("/password", verifyToken, async (req, res) => {
 });
 
 //GET ROUTE TO FORWARD PUBLIC PROFILE DATA
-app.get("/userProfile/:user_id", async (req, res) => {
-  const user_id = parseInt(req.params.user_id, 10);
-  if (isNaN(user_id)) {
-    return res.status(400).json({ message: "Invalid user ID format." });
-  }
+app.get("/userProfile/:username", async (req, res) => {
+  const username = req.params.username;
 
   try {
-    const userPromise = await db.query(
-      `SELECT name, username, bio, created_at, github, instagram, linkedin FROM users WHERE id = $1`,
-      [user_id],
+    const userResult = await db.query(
+      `SELECT id, name, username, bio, created_at, github, instagram, linkedin FROM users WHERE LOWER(username) = LOWER($1)`,
+      [username],
     );
-
-    const postsPromise = await db.query(
-      `SELECT id, title, content, date FROM blogposts WHERE user_id = $1 ORDER BY id DESC`,
-      [user_id],
-    );
-
-    const [userResult, postsResult] = await Promise.all([
-      userPromise,
-      postsPromise,
-    ]);
-
+    
     if (userResult.rows.length === 0) {
       return res.status(404).json({ message: "User profile not found" });
     }
+    const user = userResult.rows[0];
+
+    const postsResult = await db.query(
+      `SELECT id, title, content, date FROM blogposts WHERE user_id = $1 ORDER BY id DESC`,
+      [user.id],
+    );
+    
     res.json({
-      profile: userResult.rows[0],
+      profile: user,
       posts: postsResult.rows,
     });
   } catch (err) {

@@ -4,22 +4,61 @@
     <div class="homepage-hero">
         <span class="hero-badge">Curated Archive</span>
         <h1>A Sanctuary for Considered Thought.</h1>
-        <p div class="hero-subtext">Just as a wardrobe protects and holds what you value most, WardBlog is a curated archive built to shelter stories, preserve perspectives, and keep ideas safe from the noise.</p>
+        <p class="hero-subtext">Just as a wardrobe protects and holds what you value most, WardBlog is a curated archive built to shelter stories, preserve perspectives, and keep ideas safe from the noise.</p>
         
-        <div class="landing-actions">
-            <% if (locals.currentUser) { %>
-                <p>Welcome back, <strong><%= currentUser.username %></strong>!</p>
-                <a href="/blogs" class="btn btn-primary">Browse Blog Feed</a>
-                <a href="/new" class="btn btn-secondary">Write a Post</a>
-            <% } else { %>
-                <a href="/blogs" class="btn btn-primary">Read Articles</a>
-                <div class="auth-buttons">
-                    <a href="/login" class="btn btn-secondary">Log In</a>
-                    <a href="/register" class="btn btn-outline">Create Account</a>
-                </div>
-            <% } %>
-        </div>
+        <% if (!locals.currentUser) { %>
+            <div class="landing-actions">
+              <div class="auth-buttons">
+                <a href="/register" class="btn btn-primary">Start Writing</a>
+                <a href="/blogs" class="btn btn-outline">Explore Articles</a>
+              </div>
+            </div>
+        <% } %>
     </div>
+    <section class="recent-posts-section">
+        <div class="section-title">
+            <h2>Recent Articles</h2>
+            <a href="/blogs" class="view-all-link">Browse all &rarr;</a>
+        </div>
+
+        <% if (recentPosts && recentPosts.length > 0) { %>
+            <ul id="postsList">
+              <% recentPosts.forEach(post => { %>
+                <li>
+                  <h2><a href="/blogs/<%= post.id %>" class="post-title-link"><%= post.title %></a></h2>
+      
+                  <div class="post-header-meta">
+                    <a href="/publicProfile/<%= post.username %>">
+                      <span class="author-name"><%= post.display_name %></span>
+                      <span class="author-handle">@<%= post.username %></span>
+                    </a>
+                    <span class="post-date">
+                      &bull; <%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                    </span>
+                  </div>
+      
+                  <% const cleanSnippet = post.content ? post.content
+                    .replace(/<br\s*[\/]?>/gi, ' ')
+                    .replace(/<\/(p|li|h[1-6]|blockquote)>/gi, ' ')
+                    .replace(/<[^>]+>/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim() : ''; %>
+                  <p class="post-preview">
+                    <%= cleanSnippet.length > 180 ? cleanSnippet.substring(0, 180) + '...' : cleanSnippet %>
+                  </p>
+      
+                  <a href="/blogs/<%= post.id %>" class="read-more-btn">Read Article &rarr;</a>
+                </li>
+              <% }); %>
+            </ul>
+
+        <% } else { %>
+            <div class="empty-post-box">
+                <p>No articles published yet. Be the first to share your thoughts!</p>
+            </div>
+        <% } %>
+        
+    </section>
 </div>
 
 <%- include("partials/footer.ejs") %>

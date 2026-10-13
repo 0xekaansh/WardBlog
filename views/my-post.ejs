@@ -14,8 +14,10 @@
           </h2>
 
           <div class="post-header-meta">
-            <span class="author-name"><%= post.display_name %></span>
-            <span class="author-handle">@<%= post.username %></span>
+            <a href="/publicProfile/<%= post.username %>">
+              <span class="author-name"><%= post.display_name %></span>
+              <span class="author-handle">@<%= post.username %></span>
+            </a>
             <span class="post-date">
               &bull; <%= new Date(post.date).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %>
             </span>
@@ -32,7 +34,7 @@
           </p>
 
           <a href="/blogs/<%= post.id %>" class="read-more-btn">Read Article &rarr;</a>
-          <div class="post-actions">
+          <div class="post-actions myPosts">
             <a class="edit-btn" href="/edit/<%= post.id %>">Edit Article</a>
             <form action="/api/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
               <button type="submit" class="delete-btn" onclick="return confirm('Delete this post?');">Delete Article</button>
