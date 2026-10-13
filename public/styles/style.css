@@ -342,7 +342,6 @@ header.header {
 .ql-toolbar.ql-snow .ql-formats {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    overflow: auto;
     padding: 0.45rem;
     align-items: center;
 }
