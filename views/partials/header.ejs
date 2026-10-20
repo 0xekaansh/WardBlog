@@ -34,5 +34,33 @@
               <a href="/register">Register</a>
               <% } %>
             </div>
+
+        <!-- mobile navbar -->
+        <div class="mobile-nav-dropdown dropdown">
+          <button type="button" class="dropdown-toggle" aria-expanded="false">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+      
+          <div class="dropdown-menu">
+            <a href="/">Home</a>
+            <a href="/blogs">Read Blogs</a>
+            <% if(locals.currentUser) { %>
+              <a href="/new">Create Blog</a>
+              <hr class="dropdown-divider">
+              <a href="/profile">My Profile</a>
+              <a href="/my-posts">My Articles</a>
+              <hr class="dropdown-divider">
+              <a href="/logout" class="dropdown-item-danger">Log Out</a>
+            <% } else { %>
+              <a href="/login">Login</a>
+              <a href="/register">Register</a>
+            <% } %>
+          </div>
+        </div>
+
     </nav>
     </header>

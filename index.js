@@ -10,20 +10,28 @@ dotenv.config();
 const app = express();
 const port = process.env.APP_PORT || 4000;
 
-const db = new pg.Pool({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DATABASE,
-  password: process.env.PG_PASSWORD,
-  port: process.env.PG_PORT,
-});
+const db = new pg.Pool(
+  process.env.DATABASE_URL
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl:
+          process.env.NODE_ENV === "production"
+            ? { rejectUnauthorized: false }
+            : false,
+      }
+    : {
+        user: process.env.PG_USER,
+        host: process.env.PG_HOST,
+        database: process.env.PG_DATABASE,
+        password: process.env.PG_PASSWORD,
+        port: process.env.PG_PORT,
+      },
+);
 
 function cleanIncomingHTML(rawContent) {
   if (!rawContent) return "";
 
-  let cleaned = rawContent
-    .replace(/&nbsp;/g, " ")
-    .replace(/\u00a0/g, " ");
+  let cleaned = rawContent.replace(/&nbsp;/g, " ").replace(/\u00a0/g, " ");
 
   const preBlocks = [];
   cleaned = cleaned.replace(/<pre[\s\S]*?<\/pre>/gi, (match) => {
@@ -31,9 +39,7 @@ function cleanIncomingHTML(rawContent) {
     return `__PRE_BLOCK_${preBlocks.length - 1}__`;
   });
 
-  cleaned = cleaned
-    .replace(/\r?\n|\r/g, " ")
-    .replace(/\s+/g, " ");
+  cleaned = cleaned.replace(/\r?\n|\r/g, " ").replace(/\s+/g, " ");
 
   preBlocks.forEach((block, index) => {
     cleaned = cleaned.replace(`__PRE_BLOCK_${index}__`, block);
@@ -43,10 +49,30 @@ function cleanIncomingHTML(rawContent) {
 }
 
 const sanitizeOptions = {
-  allowedTags: ["b", "i", "em", "strong", "u", "s", "strike", "h1", "h2", "h3", "p", "code", "blockquote", "pre", "ul", "ol", "li", "a", "br"],
+  allowedTags: [
+    "b",
+    "i",
+    "em",
+    "strong",
+    "u",
+    "s",
+    "strike",
+    "h1",
+    "h2",
+    "h3",
+    "p",
+    "code",
+    "blockquote",
+    "pre",
+    "ul",
+    "ol",
+    "li",
+    "a",
+    "br",
+  ],
   allowedAttributes: {
-    a: ["href", "target", "rel"]
-  }
+    a: ["href", "target", "rel"],
+  },
 };
 
 app.use(express.urlencoded({ extended: true }));
@@ -241,7 +267,7 @@ app.get("/userProfile/:username", async (req, res) => {
       `SELECT id, name, username, bio, created_at, github, instagram, linkedin FROM users WHERE LOWER(username) = LOWER($1)`,
       [username],
     );
-    
+
     if (userResult.rows.length === 0) {
       return res.status(404).json({ message: "User profile not found" });
     }
@@ -251,7 +277,7 @@ app.get("/userProfile/:username", async (req, res) => {
       `SELECT id, title, content, date FROM blogposts WHERE user_id = $1 ORDER BY id DESC`,
       [user.id],
     );
-    
+
     res.json({
       profile: user,
       posts: postsResult.rows,
@@ -375,7 +401,10 @@ app.patch("/posts/:id", verifyToken, async (req, res) => {
   const userId = req.user.id;
 
   const normalized = cleanIncomingHTML(content);
-  const cleanContent = normalized !== undefined ? sanitizeHtml(normalized, sanitizeOptions) : undefined;
+  const cleanContent =
+    normalized !== undefined
+      ? sanitizeHtml(normalized, sanitizeOptions)
+      : undefined;
 
   try {
     const result = await db.query(
